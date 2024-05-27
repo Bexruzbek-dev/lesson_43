@@ -1,63 +1,78 @@
 import 'package:flutter/material.dart';
 import 'package:lesson_43/utils/app_constants.dart';
+import 'package:lesson_43/views/screens/lock_screen.dart';
 import 'package:lesson_43/views/screens/home_screen.dart';
 
-void main(List<String> args) {
-  runApp(const MyApp());
+
+void main() {
+  runApp(MyApp());
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
-
   @override
-  State<MyApp> createState() => _MyAppState();
+  _MyAppState createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
-  void changeThemeMode(bool isDark) {
-    AppConstants.themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
-    setState(() {});
+  bool isUnlocked = false;
+
+  void unlockApp() {
+    setState(() {
+      isUnlocked = true;
+    });
   }
 
-  void appBarColor(Color appBarColor) {
-    AppConstants.appBarColor;
-    setState(() {});
+  void _updateThemeMode(bool isDark) {
+    setState(() {
+      AppConstants.themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
+    });
   }
 
-  void bodyColor(Color bodyColor) {
-    AppConstants.bodyColor;
-    setState(() {});
+  void _updateAppBarColor(Color color) {
+    setState(() {
+      AppConstants.appBarColor = color;
+    });
   }
 
-  void textSize(double size) {
-    AppConstants.textSize;
-    setState(() {});
+  void _updateBodyColor(Color color) {
+    setState(() {
+      AppConstants.bodyColor = color;
+    });
   }
 
-  void textColor(Color textColor) {
-    AppConstants.textColor;
-    setState(() {});
+  void _updateTextSize(double size) {
+    setState(() {
+      AppConstants.textSize = size;
+    });
+  }
+
+  void _updateTextColor(Color color) {
+    setState(() {
+      AppConstants.textColor = color;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
+      title: 'Lock Screen App',
       theme: ThemeData(
-        appBarTheme: AppBarTheme(
-          backgroundColor: AppConstants.appBarColor,
-        ),
-        scaffoldBackgroundColor: AppConstants.bodyColor,
+        primarySwatch: Colors.blue,
+        brightness: AppConstants.themeMode == ThemeMode.dark ? Brightness.dark : Brightness.light,
+        appBarTheme: AppBarTheme(color: AppConstants.appBarColor),
+        textTheme: TextTheme(bodyMedium: TextStyle(color: AppConstants.textColor, fontSize: AppConstants.textSize)),
       ),
-      darkTheme: ThemeData.dark(),
-      themeMode: AppConstants.themeMode,
-      home: HomeScreen(
-        onThemeModeChanged: changeThemeMode,
-        appBarColor: appBarColor,
-        bodyColor: bodyColor,
-        textSize: textSize,
-        textColor: textColor,
-      ),
+      home: isUnlocked
+          ? HomeScreen(
+              onThemeModeChanged: _updateThemeMode,
+              appBarColor: _updateAppBarColor,
+              bodyColor: _updateBodyColor,
+              textSize: _updateTextSize,
+              textColor: _updateTextColor,
+            )
+          : LockScreen(
+              onSuccessfulUnlock: unlockApp,
+            ),
     );
   }
 }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:lesson_43/utils/app_constants.dart';
-import 'package:lesson_43/views/widgets/custom_drawer.dart';
 
 class SettingsScreen extends StatefulWidget {
   final ValueChanged<bool> onThemeModeChanged;
@@ -11,16 +10,17 @@ class SettingsScreen extends StatefulWidget {
   final ValueChanged<double> textSize;
   final ValueChanged<Color> textColor;
 
-  const SettingsScreen(
-      {super.key,
-      required this.onThemeModeChanged,
-      required this.appBarColor,
-      required this.bodyColor,
-      required this.textSize,
-      required this.textColor});
+  const SettingsScreen({
+    super.key,
+    required this.onThemeModeChanged,
+    required this.appBarColor,
+    required this.bodyColor,
+    required this.textSize,
+    required this.textColor,
+  });
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  _SettingsScreenState createState() => _SettingsScreenState();
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
@@ -33,15 +33,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Sozlamalar"),
-        backgroundColor:
-            appBarPickerColor, // Set the app bar color to the local state variable
-      ),
-      drawer: CustomDrawer(
-        onThemeModeChanged: widget.onThemeModeChanged,
-        appBarColor: widget.appBarColor,
-        bodyColor: widget.bodyColor,
-        textSize: widget.textSize,
-        textColor: widget.textColor,
+        backgroundColor: appBarPickerColor,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -51,6 +43,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               value: AppConstants.themeMode == ThemeMode.dark,
               onChanged: (value) {
                 widget.onThemeModeChanged(value);
+                setState(() {
+                  AppConstants.themeMode =
+                      value ? ThemeMode.dark : ThemeMode.light;
+                });
               },
               title: const Text("Tungi holat"),
             ),
@@ -103,7 +99,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: BlockPicker(
               pickerColor: tempPickerColor,
               onColorChanged: (Color color) {
-                tempPickerColor = color; // Update the temporary picker color
+                tempPickerColor = color;
               },
             ),
           ),
@@ -112,10 +108,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: const Text('Done'),
               onPressed: () {
                 setState(() {
-                  appBarPickerColor =
-                      tempPickerColor; // Update the app bar picker color state variable
-                  AppConstants.appBarColor =
-                      tempPickerColor; // Update the AppConstants color
+                  appBarPickerColor = tempPickerColor;
+                  AppConstants.appBarColor = tempPickerColor;
                 });
                 widget.appBarColor(tempPickerColor);
                 Navigator.of(context).pop();
@@ -138,7 +132,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: BlockPicker(
               pickerColor: tempPickerColor,
               onColorChanged: (Color color) {
-                tempPickerColor = color; // Update the temporary picker color
+                tempPickerColor = color;
               },
             ),
           ),
@@ -147,10 +141,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: const Text('Done'),
               onPressed: () {
                 setState(() {
-                  bodyPickerColor =
-                      tempPickerColor; // Update the body picker color state variable
-                  AppConstants.bodyColor =
-                      tempPickerColor; // Update the AppConstants color
+                  bodyPickerColor = tempPickerColor;
+                  AppConstants.bodyColor = tempPickerColor;
                 });
                 widget.bodyColor(tempPickerColor);
                 Navigator.of(context).pop();
@@ -174,7 +166,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             controller: numberController,
             keyboardType: TextInputType.number,
             inputFormatters: <TextInputFormatter>[
-              FilteringTextInputFormatter.digitsOnly, // Allow only digits
+              FilteringTextInputFormatter.digitsOnly,
             ],
             decoration: const InputDecoration(
               hintText: 'Enter a number',
@@ -185,7 +177,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: const Text('Done'),
               onPressed: () {
                 double enteredNumber = double.parse(numberController.text);
-                AppConstants.textSize = enteredNumber;
+                setState(() {
+                  AppConstants.textSize = enteredNumber;
+                });
                 widget.textSize(enteredNumber);
                 Navigator.of(context).pop();
               },
@@ -196,38 +190,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _showColorPickerDialogText(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        Color tempPickerColor = textPickerColor;
-        return AlertDialog(
-          title: const Text('Pick a color'),
-          content: SingleChildScrollView(
-            child: BlockPicker(
-              pickerColor: tempPickerColor,
-              onColorChanged: (Color color) {
-                tempPickerColor = color; // Update the temporary picker color
-              },
-            ),
+ void _showColorPickerDialogText(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      Color tempPickerColor = textPickerColor;
+      return AlertDialog(
+        title: const Text('Pick a color'),
+        content: SingleChildScrollView(
+          child: BlockPicker(
+            pickerColor: tempPickerColor,
+            onColorChanged: (Color color) {
+              tempPickerColor = color;
+            },
           ),
-          actions: <Widget>[
-            ElevatedButton(
-              child: const Text('Done'),
-              onPressed: () {
-                setState(() {
-                  textPickerColor =
-                      tempPickerColor; // Update the text picker color state variable
-                  AppConstants.textColor =
-                      tempPickerColor; // Update the AppConstants color
-                });
-                widget.textColor(tempPickerColor);
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+        ),
+        actions: <Widget>[
+          ElevatedButton(
+            child: const Text('Done'),
+            onPressed: () {
+              setState(() {
+                textPickerColor = tempPickerColor;
+                AppConstants.textColor = tempPickerColor;
+              });
+              widget.textColor(tempPickerColor);
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
 }
